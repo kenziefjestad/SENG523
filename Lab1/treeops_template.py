@@ -1,21 +1,50 @@
+from platform import node
 import sys
 import ast
 import zss
 
 class NodeVisitor(ast.NodeVisitor):
+
+    len = 0
     
     def generic_visit(self, node):
-        print(f'entering {node.__class__.__name__}')
+        # print(f'entering {node.__class__.__name__}')
+        NodeVisitor.len += 1
         super().generic_visit(node)
-        print(f'leaving {node.__class__.__name__}')
+        # print(f'leaving {node.__class__.__name__}')
 
-    def compare_trees(self, node1, node2):
-        print(f'comparing {node1.__class__.__name__} to {node2.__class__.__name__}')
-        compare_nodes(ast.iter_child_nodes(node1), ast.iter_child_nodes(node2))
+    # def compare_trees(self, node1, node2):
+    #     print(f'comparing {node1.__class__.__name__} to {node2.__class__.__name__}')
+    #     compare_nodes(ast.iter_child_nodes(node1), ast.iter_child_nodes(node2))
+
+    @staticmethod
+    def get_children(node):
+        # print(f'getting children of {node.__class__.__name__}')
+        #print(list(ast.iter_child_nodes(node)))
+        return list(ast.iter_child_nodes(node))
+
+    @staticmethod
+    def get_label(node):
+        # print(f'getting label of {node.__class__.__name__}')
+        # print(node.__class__.__name__)
+        # return type(node)
+        return node.__class__.__name__
 
 def test():
     tree = ast.parse("def iseven(x):\n    if x % 2:\n        return False\n    else:\n        return True")
     tree2 = ast.parse("def isodd(x):\n    if x % 2:\n        return True\n    else:\n        return False")
+
+    tree3 = ast.parse("def f(x):\n    return x")
+
+    # print(ast.dump(tree3, indent = 2))
+
+    v = NodeVisitor()
+    v.visit(tree)
+    print(f'Number of nodes: {NodeVisitor.len}')
+
+    # print(NodeVisitor.get_label(tree))
+    # print(NodeVisitor.get_children(tree))
+    # print(NodeVisitor.get_label(tree2))
 
 def compare_nodes(n1, n2):
     if type(n1) != type(n2):
@@ -70,7 +99,24 @@ def do_cmp(fname1, fname2):
 
 # Provide the solution to Exercise 3 by implementing the function below
 def do_dst(fname1, fname2):
-    print("WHOPS! 'dst' command not implemented!")
+    n1 = ast.parse(open(fname1).read())
+    n2 = ast.parse(open(fname2).read())
+    print(ast.dump(n1, indent = 2))
+    # print(ast.dump(n2, indent = 2))
+    dist = zss.simple_distance(n1, n2, NodeVisitor.get_children, NodeVisitor.get_label)
+    v = NodeVisitor()
+    v.visit(n1)
+    n1_len = NodeVisitor.len
+    NodeVisitor.len = 0
+    v.visit(n2)
+    n2_len = NodeVisitor.len
+    normalized_dist = dist / (n1_len + n2_len)
+    # print(n1_len)
+    # print(n2_len)
+    # print(f'{NodeVisitor.len + len(ast.dump(n2))}')
+    print(f"Tree distance: {dist}")
+    print(f"Normalized distance: {normalized_dist}")
+    # print("WHOPS! 'dst' command not implemented!")
     return -1
 
 # Provide the solution to Exercise 4 by implementing the function below
