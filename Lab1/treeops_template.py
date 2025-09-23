@@ -140,18 +140,18 @@ def do_cmp(fname1, fname2):
         print("The programs are different")
     return -1
 
-def label_dist(str1, str2):
-    # print(f'comparing {n1.__class__.__name__} to {n2.__class__.__name__}')
-    # if n1.__class__.__name__ == "Constant" and n2.__class__.__name__ == "Constant":
-    #     return 0
-    # elif n1.__class__.__name__ == "Name" and n2.__class__.__name__ == "Name":
-    #     return 0
-    if str1 == "Store" or str2 == "Store":
-        return 0
-    print(f'comparing {str1} to {str2}')
-    if str1 != str2:
-        return 1
-    return 0
+# def label_dist(str1, str2):
+#     # print(f'comparing {n1.__class__.__name__} to {n2.__class__.__name__}')
+#     # if n1.__class__.__name__ == "Constant" and n2.__class__.__name__ == "Constant":
+#     #     return 0
+#     # elif n1.__class__.__name__ == "Name" and n2.__class__.__name__ == "Name":
+#     #     return 0
+#     if str1 == "Store" or str2 == "Store":
+#         return 0
+#     print(f'comparing {str1} to {str2}')
+#     if str1 != str2:
+#         return 1
+#     return 0
 
 # Provide the solution to Exercise 3 by implementing the function below
 def do_dst(fname1, fname2):
@@ -159,7 +159,7 @@ def do_dst(fname1, fname2):
     n2 = ast.parse(open(fname2).read())
     print(ast.dump(n1, indent = 2))
     # print(ast.dump(n2, indent = 2))
-    dist = zss.simple_distance(n1, n2, NodeVisitor.get_children, NodeVisitor.get_label, label_dist)
+    dist = zss.simple_distance(n1, n2, NodeVisitor.get_children, NodeVisitor.get_label)
     v = NodeVisitor()
     v.visit(n1)
     n1_len = NodeVisitor.len
