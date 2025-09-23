@@ -1,4 +1,3 @@
-from platform import node
 import sys
 import ast
 import zss
@@ -8,6 +7,8 @@ class NodeVisitor(ast.NodeVisitor):
     len = 0
 
     vars = {}
+
+    final_var = None
     
     def generic_visit(self, node):
         # if node.__class__.__name__ == "Assign":
@@ -111,6 +112,7 @@ def assign_eq(node, vars):
         value = expr_eq(node.value, vars)
         if value is not None:
             vars[target] = value
+            NodeVisitor.final_var = value
 
 def main():
     if len(sys.argv) == 4 and sys.argv[1] == "cmp":
@@ -138,19 +140,34 @@ def do_cmp(fname1, fname2):
         print("The programs are different")
     return -1
 
+def label_dist(str1, str2):
+    # print(f'comparing {n1.__class__.__name__} to {n2.__class__.__name__}')
+    # if n1.__class__.__name__ == "Constant" and n2.__class__.__name__ == "Constant":
+    #     return 0
+    # elif n1.__class__.__name__ == "Name" and n2.__class__.__name__ == "Name":
+    #     return 0
+    if str1 == "Store" or str2 == "Store":
+        return 0
+    print(f'comparing {str1} to {str2}')
+    if str1 != str2:
+        return 1
+    return 0
+
 # Provide the solution to Exercise 3 by implementing the function below
 def do_dst(fname1, fname2):
     n1 = ast.parse(open(fname1).read())
     n2 = ast.parse(open(fname2).read())
     print(ast.dump(n1, indent = 2))
     # print(ast.dump(n2, indent = 2))
-    dist = zss.simple_distance(n1, n2, NodeVisitor.get_children, NodeVisitor.get_label)
+    dist = zss.simple_distance(n1, n2, NodeVisitor.get_children, NodeVisitor.get_label, label_dist)
     v = NodeVisitor()
     v.visit(n1)
     n1_len = NodeVisitor.len
     NodeVisitor.len = 0
     v.visit(n2)
     n2_len = NodeVisitor.len
+    print(f'Number of nodes in tree 1: {n1_len}')
+    print(f'Number of nodes in tree 2: {n2_len}')
     normalized_dist = dist / (n1_len + n2_len)
     # print(n1_len)
     # print(n2_len)
@@ -163,10 +180,11 @@ def do_dst(fname1, fname2):
 # Provide the solution to Exercise 4 by implementing the function below
 def do_run(fname):
     n = ast.parse(open(fname).read())
-    print(ast.dump(n, indent = 2))
+    # print(ast.dump(n, indent = 2))
     v = NodeVisitor()
     v.visit(n)
-    print(NodeVisitor.vars)
+    # print(NodeVisitor.vars)
+    print(f'The final value is {NodeVisitor.final_var}')
     # print("WHOPS! 'run' command not implemented!")
     return -1
 
