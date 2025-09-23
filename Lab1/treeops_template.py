@@ -6,9 +6,14 @@ import zss
 class NodeVisitor(ast.NodeVisitor):
 
     len = 0
+
+    vars = {}
     
     def generic_visit(self, node):
+        # if node.__class__.__name__ == "Assign":
+        #     print("Assignment")
         # print(f'entering {node.__class__.__name__}')
+        assign_eq(node, NodeVisitor.vars)
         NodeVisitor.len += 1
         super().generic_visit(node)
         # print(f'leaving {node.__class__.__name__}')
@@ -71,6 +76,42 @@ def compare_nodes(n1, n2):
 
     return True
 
+def expr_eq(node, vars):
+    # if node.__class__.__name__ == "Constant":
+    #     print(ast.literal_eval(node))
+    # pass
+
+    # BinOp with left and right side
+    # check if left is binop, if so, recurse
+    # if not, check if left is a variable, if so, look up in vars
+    # if not, it's a constant, so just use it
+    # do the same for right side
+    # then do the operation and return the result
+
+    if node.__class__.__name__ == "BinOp":
+        left = expr_eq(node.left, vars)
+        right = expr_eq(node.right, vars)
+        if left is not None and right is not None:
+            if node.op.__class__.__name__ == "Add":
+                return left + right
+            elif node.op.__class__.__name__ == "Mult":
+                return left * right
+    elif node.__class__.__name__ == "Name":
+        return vars.get(node.id, None)
+    elif node.__class__.__name__ == "Constant":
+        return ast.literal_eval(node)
+    return None
+
+def assign_eq(node, vars):
+    # check if node is an Assign node
+    # if so, get the target name and evaluate the value expression
+    # store the result in vars under the target name
+    if node.__class__.__name__ == "Assign":
+        target = node.targets[0].id
+        value = expr_eq(node.value, vars)
+        if value is not None:
+            vars[target] = value
+
 def main():
     if len(sys.argv) == 4 and sys.argv[1] == "cmp":
         return do_cmp(sys.argv[2], sys.argv[3])
@@ -121,7 +162,12 @@ def do_dst(fname1, fname2):
 
 # Provide the solution to Exercise 4 by implementing the function below
 def do_run(fname):
-    print("WHOPS! 'run' command not implemented!")
+    n = ast.parse(open(fname).read())
+    print(ast.dump(n, indent = 2))
+    v = NodeVisitor()
+    v.visit(n)
+    print(NodeVisitor.vars)
+    # print("WHOPS! 'run' command not implemented!")
     return -1
 
 
