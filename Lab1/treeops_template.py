@@ -142,7 +142,7 @@ def do_cmp(fname1, fname2):
     if compare_nodes(n1, n2):
         print("The programs are identical")
     else:
-        print("The programs are different")
+        print("The programs are not identical")
     return -1
 
 # def label_dist(str1, str2):
