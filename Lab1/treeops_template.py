@@ -15,7 +15,12 @@ class NodeVisitor(ast.NodeVisitor):
         #     print("Assignment")
         # print(f'entering {node.__class__.__name__}')
         assign_eq(node, NodeVisitor.vars)
-        NodeVisitor.len += 1
+        if node.__class__.__name__ != "Load" and node.__class__.__name__ != "Store":
+            NodeVisitor.len += 1
+        # elif node.__class__.__name__ != "Store":
+        #     NodeVisitor.len += 1
+            # print(f'Skipping {node.__class__.__name__}')
+        # NodeVisitor.len += 1
         super().generic_visit(node)
         # print(f'leaving {node.__class__.__name__}')
 
@@ -146,9 +151,11 @@ def do_cmp(fname1, fname2):
 #     #     return 0
 #     # elif n1.__class__.__name__ == "Name" and n2.__class__.__name__ == "Name":
 #     #     return 0
+#     if str1 == "Load" or str2 == "Load":
+#         return 0
 #     if str1 == "Store" or str2 == "Store":
 #         return 0
-#     print(f'comparing {str1} to {str2}')
+#     # print(f'comparing {str1} to {str2}')
 #     if str1 != str2:
 #         return 1
 #     return 0
@@ -174,6 +181,7 @@ def do_dst(fname1, fname2):
     # print(f'{NodeVisitor.len + len(ast.dump(n2))}')
     print(f"Tree distance: {dist}")
     print(f"Normalized distance: {normalized_dist}")
+    print(f"The normalized tree edit distance is {normalized_dist}")
     # print("WHOPS! 'dst' command not implemented!")
     return -1
 
